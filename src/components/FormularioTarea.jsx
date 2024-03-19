@@ -20,6 +20,7 @@ const FormularioTarea = () => {
   useEffect(() => {
     peticionGet()
   }, [tareas])
+
   const peticionPost = async () => {
 
   }
@@ -29,8 +30,11 @@ const FormularioTarea = () => {
 
     setTarea("")
   }
-  const borrarTarea = (id) => {
-    
+  const borrarTarea = async(_id) => {
+    const tareasFiltradas = tareas.filter((tarea) => tarea._id !== _id)
+    const response = await fetch(`${SERVER_BACKEND}/api/tarea/${_id}`, {method: "DELETE",})
+    const data = await response.json()
+    alert(data.mensage)
     setTareas(tareasFiltradas);
   }
   return (
