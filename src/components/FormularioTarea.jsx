@@ -22,12 +22,23 @@ const FormularioTarea = () => {
   }, [tareas])
 
   const peticionPost = async () => {
-
+    try {
+      const respuesta = await fetch(`${SERVER_BACKEND}/api/tareas/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({contenido: tarea}),
+      });
+    } catch (error) {
+      console.log(error);
+      alert("Upps! Ocurrio un error, vuelve a intentarlo mas tarde")
+    }
   }
 
   const handlerSubmit = (e) => {
     e.preventDefault()
-
+    peticionPost()
     setTarea("")
   }
   const borrarTarea = async(_id) => {
