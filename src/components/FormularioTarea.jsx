@@ -1,30 +1,51 @@
 import { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import ListaTareas from './ListaTareas';
-// import Form from 'react-bootstrap/Form';
-// import Button from 'react-bootstrap/Button';
 
 const FormularioTarea = () => {
   const [tarea, setTarea] = useState('');
-  const tareasLocalStorage = JSON.parse(localStorage.getItem("tareasKey")) || []
-  const [tareas, setTareas] = useState(tareasLocalStorage);
+  const [tareas, setTareas] = useState([]);
+  const SERVER_BACKEND = import.meta.env.VITE_BACKEND_SERVER
 
-  useEffect(()=>{
-    console.log("aqui guardo en el localStorage")
-    localStorage.setItem("tareasKey", JSON.stringify(tareas));
-  },[tareas])
+  const peticionGet = async () => {
+    try {
+      const response = await fetch(`${SERVER_BACKEND}/api/tareas/`)
+      const data = await response.json();
+      setTareas(data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    peticionGet()
+  }, [tareas])
+
+  const peticionPost = async () => {
+    try {
+      const respuesta = await fetch(`${SERVER_BACKEND}/api/tareas/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({contenido: tarea}),
+      });
+    } catch (error) {
+      console.log(error);
+      alert("Upps! Ocurrio un error, vuelve a intentarlo mas tarde")
+    }
+  }
 
   const handlerSubmit = (e) => {
     e.preventDefault()
-    // metemos cosas en el ARRAY
-    // operador spread ...
-    setTareas([...tareas, {id: tareas.length, nombre: tarea}])
-    // limpiamos el formulario
+    peticionPost()
     setTarea("")
   }
-  const borrarTarea = (id) => {
-    // tareas.splice
-    const tareasFiltradas = tareas.filter((tarea) => tarea.id !== id)
+  const borrarTarea = async(_id) => {
+    const tareasFiltradas = tareas.filter((tarea) => tarea._id !== _id)
+    const response = await fetch(`${SERVER_BACKEND}/api/tarea/${_id}`, {method: "DELETE",})
+    const data = await response.json()
+    alert(data.mensage)
     setTareas(tareasFiltradas);
   }
   return (
